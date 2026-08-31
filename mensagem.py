@@ -3,6 +3,10 @@ from Contatos import CONTATOS
 
 TEXTO = "Bom dia meu amor, tudo bem? Espero que sim, te amo muito e que seu dia seja maravilhoso"
 
+# Coordenada da caixa de mensagem, usada so como reforco do Esc.
+# Se voce trocar de monitor/resolucao, remede com o cordenadas.py.
+CAIXA_MENSAGEM = (2555, 679)
+
 
 def abrir_whatsapp():
     """Abre o WhatsApp uma vez so, antes de comecar a rodar a lista."""
@@ -14,21 +18,33 @@ def abrir_whatsapp():
     pa.sleep(10)  # WhatsApp abrir E carregar a lista de conversas
 
 
+def focar_caixa_de_mensagem():
+    """Dois caminhos independentes pra garantir o foco na caixa de texto.
+
+    Se um falhar o outro cobre: o Esc funciona em qualquer resolucao mas
+    depende do WhatsApp devolver o foco sozinho; o clique nao depende disso
+    mas so vale pra esta resolucao.
+    """
+    pa.press("esc")  # 1) sai da barra de busca
+    pa.sleep(0.5)
+    pa.click(CAIXA_MENSAGEM)  # 2) reforco: clica direto na caixa
+    pa.sleep(0.5)
+
+
 def enviar_para(contato, texto=TEXTO):
     """Assume o WhatsApp ja aberto. Busca o contato e manda a mensagem."""
-    pa.click(2129, 127)  # barra de busca do WhatsApp
+    pa.hotkey("ctrl", "f")  # barra de busca do WhatsApp
     pa.sleep(1)
     pa.hotkey("ctrl", "a")  # limpa a busca do contato anterior
     pa.press("delete")
     pa.write(contato)
     pa.sleep(2)  # ESSENCIAL: esperar a lista filtrar
 
-    pa.click(2167, 279)  # 1o resultado, agora ja filtrado
+    pa.press("enter")  # 1o resultado, agora ja filtrado
     pa.sleep(2)  # a conversa abrir
 
-    pa.click(2555, 679)  # caixa de mensagem
-    pa.sleep(0.5)
-    pa.write(texto)
+    focar_caixa_de_mensagem()
+    pa.write(texto, interval=0.01)  # interval: digitacao mais estavel
     pa.sleep(0.5)
     pa.press("enter")
 
