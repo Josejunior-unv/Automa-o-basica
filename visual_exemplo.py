@@ -111,18 +111,16 @@ def enviar_agora():
         return
 
     ajustes = config.carregar_ajustes()
-    if not config.coordenada_configurada(ajustes):
-        messagebox.showwarning(
-            "Falta configurar",
-            "A posicao da caixa de mensagem ainda nao foi definida.\n\n"
-            "Use o botao 'Capturar posicao' antes de enviar.",
-        )
-        return
+    if config.coordenada_configurada(ajustes):
+        modo = "com clique na caixa de mensagem"
+    else:
+        modo = "apenas teclado (sem posicao configurada)"
 
     minutos = estimar_minutos(len(numeros), ajustes)
     confirmou = messagebox.askyesno(
         "Confirmar envio",
         f"Enviar para {len(numeros)} contato(s) AGORA?\n\n"
+        f"Modo: {modo}.\n"
         f"Tempo estimado: {minutos}.\n\n"
         "Nao mexa no mouse nem no teclado durante o envio.\n"
         "Para abortar: jogue o mouse no canto superior esquerdo da tela.",
@@ -178,6 +176,17 @@ campo_mensagem.pack(fill="x", padx=10, pady=5)
 # --- ajustes desta maquina ---
 grupo = tk.LabelFrame(janela, text="Ajustes desta maquina", font=("Segoe UI", 9, "bold"))
 grupo.pack(fill="x", padx=10, pady=(10, 5))
+
+tk.Label(
+    grupo,
+    text=(
+        "Posicao e opcional: em 0,0 o envio usa so o teclado.\n"
+        "Configure se a mensagem nao estiver sendo digitada."
+    ),
+    font=("Segoe UI", 8),
+    justify="left",
+    fg="#555555",
+).pack(padx=8, pady=(6, 0), anchor="w")
 
 linha_xy = tk.Frame(grupo)
 linha_xy.pack(fill="x", padx=8, pady=(8, 4))

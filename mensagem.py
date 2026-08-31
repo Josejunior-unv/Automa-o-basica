@@ -30,9 +30,12 @@ def enviar_para(contato, texto, ajustes):
     pa.press("enter")  # 1o resultado, agora ja filtrado
     pa.sleep(ajustes["espera_conversa"])  # a conversa abrir
 
-    # foco na caixa de texto (coordenada medida nesta maquina)
-    pa.click(ajustes["caixa_mensagem_x"], ajustes["caixa_mensagem_y"])
-    pa.sleep(0.5)
+    # Foco na caixa de texto. Com a posicao configurada, clica nela (mais
+    # seguro). Sem posicao, confia no foco que o WhatsApp da sozinho ao
+    # abrir a conversa - funciona quase sempre, mas nao e garantido.
+    if config.coordenada_configurada(ajustes):
+        pa.click(ajustes["caixa_mensagem_x"], ajustes["caixa_mensagem_y"])
+        pa.sleep(0.5)
 
     pa.write(texto, interval=0.01)  # interval: digitacao mais estavel
     pa.sleep(0.5)
@@ -52,12 +55,11 @@ def enviar_todos(contatos=None, texto=None, ajustes=None):
         print("Nenhum contato em contatos.json. Nada a fazer.")
         return
 
-    if not config.coordenada_configurada(ajustes):
-        print(
-            "Coordenada da caixa de mensagem nao configurada.\n"
-            "Abra a interface e use 'Capturar posicao' antes de enviar."
-        )
-        return
+    if config.coordenada_configurada(ajustes):
+        print("Modo: clique na caixa de mensagem "
+              f"({ajustes['caixa_mensagem_x']}, {ajustes['caixa_mensagem_y']})")
+    else:
+        print("Modo: apenas teclado (posicao da caixa nao configurada)")
 
     abrir_whatsapp(ajustes)
     for i, contato in enumerate(contatos, 1):
